@@ -1,7 +1,8 @@
 function Player(hp, name) {
     return {
         hp: hp,
-        name: name
+        name: name,
+        disabled: false
     }
 }
 

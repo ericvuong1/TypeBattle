@@ -20,25 +20,28 @@ let game = null;
 
 io.on('connection', (sock) => {
 
-  if (waitingPlayer) {
-    game = new TypeBattleGame(waitingPlayer, sock);
-    currentState = game.currentState;
+    if (waitingPlayer) {
+      game = new TypeBattleGame(waitingPlayer, sock);
+      let currentState = game.currentState;
+      console.log(currentState)
 
-    sock.emit('info', 'Player2');
-    sock.emit('state', currentState)
-    waitingPlayer.emit('state', currentState);
-  } else {
-    waitingPlayer = sock;
-    waitingPlayer.emit('message', 'Waiting for an opponent');
-    waitingPlayer.emit('info', 'Player1');
-  }
+      sock.emit('info', 'Player2');
+      sock.emit('state', currentState)
+      waitingPlayer.emit('state', currentState);
+      waitingPlayer = null;
+    } else {
+      console.log('Waiting for game');
+      waitingPlayer = sock;
+      waitingPlayer.emit('message', 'Waiting for an opponent');
+      waitingPlayer.emit('info', 'Player1');
+    }
 
   sock.on('message', (text) => {
     io.emit('message', text);
   });
 
   sock.on('update', (text) => {
-    console.log(`Updating game state with info ${text}`)
+    game && game.update(text);
   })
 });
 

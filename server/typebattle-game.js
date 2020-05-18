@@ -21,6 +21,38 @@ class TypeBattleGame {
       });
     });
   }
+  otherPlayer(player) {
+    if (player == 'Player1') {
+      return 'Player2';
+    } else {
+      return 'Player1';
+    }
+  }
+
+  _attackPlayer(player, damage) {
+      this.currentState[player]['hp'] = this.currentState[player]['hp'] - damage;
+  }
+
+  update(msg) {
+    let [attacker, spell] = msg.split(": ");
+    switch (spell) {
+      case 'Quick Attack':
+        let otherPlayer = this.otherPlayer(attacker);
+        let damage = 10;
+        this._attackPlayer(otherPlayer, damage);
+        break;
+      default:
+        break;
+    }
+    this._updateStateToPlayers();
+    this._checkGameOver();
+  }
+
+  _updateStateToPlayers() {
+    this._players.forEach((player) => {
+      player.emit('state', this.currentState);
+    });
+  }
 
   _sendToPlayer(playerIndex, msg) {
     msg = `Player ${playerIndex+1}: ${msg}`
@@ -42,14 +74,28 @@ class TypeBattleGame {
   }
 
   _checkGameOver() {
-    const turns = this._turns;
-
-    if (turns[0] && turns[1]) {
-      this._sendToPlayers('Game over ' + turns.join(' : '));
-      this._getGameResult();
-      this._turns = [null, null];
-      this._sendToPlayers('System: Next Round!!!!');
+    if (this.currentState['Player1']['hp'] <= 0) {
+      let winner = this._players[1];
+      let loser = this._players[0];
+      this._disableInput('Player1');
+      this._disableInput('Player2');
+      this._updateStateToPlayers();
+      this._sendWinMessage(winner, loser);
+    } else if (this.currentState['Player2']['hp'] <= 0) {
+      let winner = this._players[0];
+      let loser = this._players[1];
+      this._disableInput('Player1');
+      this._disableInput('Player2');
+      this._updateStateToPlayers();
+      this._sendWinMessage(winner, loser);
     }
+  }
+
+  _disableInput(player) {
+    this.currentState[player]['disabled'] = true;
+  }
+  _enableInput(player) {
+    player.emit('action', 'enable');
   }
 
   _getGameResult() {

@@ -20,6 +20,14 @@ const setPlayerName = (text) => {
   }
 }
 
+function removeChildrenFromParent(parent) {
+  let child = parent.firstElementChild;
+  while(child) {
+    parent.removeChild(child);
+    child = parent.lastElementChild;
+  }
+}
+
 const updateGameState = (state) => {
   console.log('Game state update');
   console.log(state);
@@ -28,7 +36,10 @@ const updateGameState = (state) => {
   console.log('current', currentPlayer);
   console.log('enemy', enemyPlayer);
 
+  // TODO: update state correctly
+
   const parent = document.querySelector('#playerInfo');
+  removeChildrenFromParent(parent);
   const you = document.createElement('h1');
   you.innerHTML = `YOU: ${currentPlayer['name']}`;
   const yourHP = document.createElement('h1');
@@ -42,6 +53,14 @@ const updateGameState = (state) => {
   parent.append(yourHP);
   parent.append(enemy);
   parent.append(enemyHP);
+
+  // Check for disabled spells
+  const input = document.querySelector('#chat')
+  if (state[playerName]['disabled']) {
+    input.disabled = true;
+  } else {
+    input.disabled = false;
+  }
 }
 
 const onFormSubmitted = (e) => {
