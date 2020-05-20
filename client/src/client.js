@@ -1,10 +1,8 @@
 let playerName = null;
 
 const writeEvent = (text) => {
-  // <ul> element
   const parent = document.querySelector('#events');
 
-  // <li> element
   const el = document.createElement('li');
   el.innerHTML = text;
 
@@ -75,21 +73,6 @@ const onFormSubmitted = (e) => {
   sock.emit('message', message);
   sock.emit('update', message);
 };
-
-const addButtonListeners = () => {
-  // ['rock', 'paper', 'scissors'].forEach((id) => {
-  //   const button = document.getElementById(id);
-  //   button.addEventListener('click', () => {
-  //     sock.emit('turn', id);
-  //   });
-  // });
-};
-
-const gameUpdate = (gameUpdate) => {
-  // TODO: Update game state
-  console.log('Updating Game!');
-  console.log(gameUpdate)
-}
 
 writeEvent('Welcome to Type Battle!');
 
