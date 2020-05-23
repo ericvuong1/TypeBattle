@@ -2,7 +2,8 @@ function Player(hp, name) {
     return {
         hp: hp,
         name: name,
-        disabled: false
+        disabled: false,
+        isBlocking: false
     }
 }
 

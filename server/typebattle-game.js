@@ -31,16 +31,43 @@ class TypeBattleGame {
   }
 
   _attackPlayer(player, damage) {
-      this.currentState[player]['hp'] = this.currentState[player]['hp'] - damage;
+      let currentPlayer = this.otherPlayer(player);
+
+      // If attacking a player that is blocking, get stunned
+      if (this.currentState[player].isBlocking) {
+        this._disableInput(currentPlayer)
+        this._updateStateToPlayers();
+
+        setTimeout(() => {
+          this._enableInput(currentPlayer);
+          this._updateStateToPlayers();
+        }, 3000);
+
+      }
+      else {
+        this.currentState[player]['hp'] = this.currentState[player]['hp'] - damage;
+      }
   }
 
   update(msg) {
     let [attacker, spell] = msg.split(": ");
+    let otherPlayer = this.otherPlayer(attacker);
     switch (spell) {
       case 'Quick Attack':
-        let otherPlayer = this.otherPlayer(attacker);
         let damage = 10;
         this._attackPlayer(otherPlayer, damage);
+        break;
+      case 'Block':
+        // set player flag to isBlocking
+        this.currentState[attacker].isBlocking = true;
+        this._updateStateToPlayers();
+        this._disableInput(attacker);
+
+        setTimeout(() => {
+          this._enableInput(attacker);
+          this.currentState[attacker].isBlocking = false;
+          this._updateStateToPlayers();
+        }, 2000);
         break;
       default:
         break;
