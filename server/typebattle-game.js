@@ -30,11 +30,11 @@ class TypeBattleGame {
     }
   }
 
-  _attackPlayer(player, damage) {
-      let currentPlayer = this.otherPlayer(player);
+  _attackPlayer(attackedPlayer, damage) {
+      let currentPlayer = this.otherPlayer(attackedPlayer);
 
       // If attacking a player that is blocking, get stunned
-      if (this.currentState[player].isBlocking) {
+      if (this.currentState[attackedPlayer].isBlocking) {
         this._disableInput(currentPlayer)
         this._updateStateToPlayers();
 
@@ -45,7 +45,7 @@ class TypeBattleGame {
 
       }
       else {
-        this.currentState[player]['hp'] = this.currentState[player]['hp'] - damage;
+        this.currentState[attackedPlayer]['hp'] = this.currentState[attackedPlayer]['hp'] - damage;
       }
   }
 
@@ -101,7 +101,7 @@ class TypeBattleGame {
   }
 
   _checkGameOver() {
-    let a = (winner, loser) => {
+    let endGame = (winner, loser) => {
       this._disableInput('Player1');
       this._disableInput('Player2');
       this._updateStateToPlayers();
@@ -111,11 +111,11 @@ class TypeBattleGame {
     if (this.currentState['Player1']['hp'] <= 0) {
       let winner = this._players[1];
       let loser = this._players[0];
-      a(winner, loser);
+      endGame(winner, loser);
     } else if (this.currentState['Player2']['hp'] <= 0) {
       let winner = this._players[0];
       let loser = this._players[1];
-      a(winner, loser);
+      endGame(winner, loser);
     }
   }
 

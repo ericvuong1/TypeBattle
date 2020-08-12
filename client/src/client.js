@@ -27,15 +27,16 @@ function removeChildrenFromParent(parent) {
 }
 
 const updateGameState = (state) => {
-  console.log('Game state update');
-  console.log(state);
+  console.log('NEW STATE', state);
   currentPlayer = state[playerName];
   enemyPlayer = state[enemyName];
   console.log('current', currentPlayer);
   console.log('enemy', enemyPlayer);
 
-  // TODO: update state correctly
-
+  /** 
+  TODO: HACKY way to update state by wiping the header and reappending
+  Removes all #playerInfo and repopulate the elements
+  */  
   const parent = document.querySelector('#playerInfo');
   removeChildrenFromParent(parent);
   const you = document.createElement('h1');
@@ -81,8 +82,7 @@ sock.on('message', writeEvent);
 sock.on('info', setPlayerName);
 sock.on('state', updateGameState);
 
+
 document
   .querySelector('#chat-form')
   .addEventListener('submit', onFormSubmitted);
-
-addButtonListeners();

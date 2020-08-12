@@ -18,8 +18,15 @@ const io = socketio(server);
 let waitingPlayer = null;
 let game = null;
 
-io.on('connection', (sock) => {
+/*
+io events:
+info -> broadcast info to users
+state -> game state
+message -> broadcast message to user
+update -> update state
+*/
 
+io.on('connection', (sock) => {
     if (waitingPlayer) {
       game = new TypeBattleGame(waitingPlayer, sock);
       let currentState = game.currentState;
