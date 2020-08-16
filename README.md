@@ -8,8 +8,5 @@ Multiplayer Type Battle to Practice Socket Programming
 1 server:
 socket opened on port 8080
 
-to run server
-```
-cd server
-node server
-```
+to run server check `server/README.md`
+
