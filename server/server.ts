@@ -29,7 +29,7 @@ update -> update state
 io.on('connection', (sock) => {
     if (waitingPlayer) {
       game = new TypeBattleGame(waitingPlayer, sock);
-      let currentState = game.currentState;
+      let currentState = game.boardState;
       console.log(currentState)
 
       sock.emit('info', 'Player2');

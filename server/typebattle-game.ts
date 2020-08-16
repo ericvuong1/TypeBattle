@@ -1,3 +1,6 @@
+/**
+ * WELCOME TO MY GOD CLASS
+ */
 import Player from './player';
 import socketio from 'socket.io';
 
@@ -17,16 +20,17 @@ interface Spell {
 }
 
 type PlayerString = "Player1" | "Player2"
+export type BoardState = {
+  "Player1": Player,
+  "Player2": Player
+}
 
 export default class TypeBattleGame {
   _players: socketio.Socket[]
   _turns: number[] | null[]
   player1: Player
   player2: Player
-  currentState: {
-    "Player1": Player,
-    "Player2": Player
-  }
+  boardState: BoardState
 
   constructor(p1: socketio.Socket, p2: socketio.Socket) {
     this._players = [p1, p2];
@@ -34,7 +38,7 @@ export default class TypeBattleGame {
     this.player1 = new Player(100, 'Player1');
     this.player2 = new Player(100, 'Player2');
 
-    this.currentState = {
+    this.boardState = {
       Player1: this.player1,
       Player2: this.player2,
     }
@@ -56,30 +60,52 @@ export default class TypeBattleGame {
     }
   }
 
-  _attackPlayer(attackedPlayer: PlayerString, damage: number) {
-      let currentPlayer = this.otherPlayer(attackedPlayer);
+  /**
+   * Attempts to attack player, could trigger various conditions and inflict damage to attacker
+   * depending on the current status of the attacked player.
+   * @param attackedPlayer 
+   * @param damage 
+   */
 
-      // If attacking a player that is blocking, get stunned
-      if (this.currentState[attackedPlayer].isBlocking) {
-        this._disableInput(currentPlayer)
+  _attemptAttackPlayer(attackedPlayer: PlayerString, spell: Spell) {
+    const damage = spell['damage'];
+    const selfDamage = spell['selfDamage']
+    const currentPlayer = this.otherPlayer(attackedPlayer);
+
+    // If attacking a player that is blocking, trigger their counter attack 
+    if (this.boardState[attackedPlayer].isInvulnerable) {
+      // Calling counter attack
+      // TODO: Do counter attack properly
+      // this.boardState[attackedPlayer]['counterAttack']!(); 
+      this._disableInput(currentPlayer)
+
+      setTimeout(() => {
+        this._enableInput(currentPlayer);
         this._updateStateToPlayers();
-
-        setTimeout(() => {
-          this._enableInput(currentPlayer);
-          this._updateStateToPlayers();
-        }, 3000);
-
-      }
-      else {
-        this.currentState[attackedPlayer]['hp'] = this.currentState[attackedPlayer]['hp'] - damage;
-      }
+      }, 3000);
+    }
+    else {
+      this.boardState[attackedPlayer]['hp'] -= damage;
+      this.boardState[currentPlayer]['hp'] -= selfDamage;
+    }
+    this._updateStateToPlayers();
   }
   _updateGameState(currentPlayer: PlayerString, msg: string) {
     const spell: Spell | undefined = spells.find((s: Spell) => s['name'] === msg);
-    const updatedBoard = spell && this._updateGameBoard(currentPlayer, spell);
+    spell && this._processSpell(currentPlayer, spell);
   }
 
-  _updateGameBoard(currentPlayer: PlayerString, spell: Spell) {
+  /**
+   * For now, invulnerability means disabling users input
+   * @param player 
+   * @param invincible 
+   */
+  _setInvulnerable(player: PlayerString, invincible: boolean) {
+    this.boardState[player]['isInvulnerable'] = invincible;
+    invincible ? this._disableInput(player) : this._enableInput(player);
+  }
+
+  _processSpell(currentPlayer: PlayerString, spell: Spell): void {
     let otherPlayer = this.otherPlayer(currentPlayer);;
     const damage = spell['damage'];
     const selfDamage = spell["selfDamage"];
@@ -90,27 +116,48 @@ export default class TypeBattleGame {
     const overtimeDamage = spell["overtimeDamage"];
     const overTimeDamageDuration = spell["overTimeDamageDuration"];
 
-    switch (spell['name']) {
-      case 'Quick Attack':
-        console.log('Attacking')
-        this._attackPlayer(otherPlayer, damage);
-        break;
-      case 'Block':
-        // set player flag to isBlocking
-        this.currentState[currentPlayer].isBlocking = true;
+    // TODO: manage cooldowns?
+
+    // Disable players in invulnerability mode
+    if (invulnerabilityTime > 0) {
+      this._setInvulnerable(currentPlayer, true)
+      setTimeout(() => {
+        this._setInvulnerable(currentPlayer, false);
         this._updateStateToPlayers();
-        this._disableInput(currentPlayer);
-        setTimeout(() => {
-          this._enableInput(currentPlayer);
-          this.currentState[currentPlayer].isBlocking = false;
-          this._updateStateToPlayers();
-        }, 2000);
-        break;
-      default:
-        break;
+        this._checkGameOver();
+      }, invulnerabilityTime);
+    }
+
+    // Damage will be delayed
+    if (delayTimeDamage > 0) {
+      this._disableInput(currentPlayer);
+      setTimeout(() => {
+        this._enableInput(currentPlayer);
+        this._attemptAttackPlayer(otherPlayer, spell);
+      }, delayTimeDamage);
     }
     this._updateStateToPlayers();
-    this._checkGameOver();
+
+    // TODO: move away from this switch case statement
+    // switch (spell['name']) {
+    //   case 'Quick Attack':
+    //     console.log('Attacking');
+    //     this._attemptAttackPlayer(otherPlayer, spell);
+    //     break;
+    //   case 'Block':
+    //     // set player flag to isBlocking
+    //     this.boardState[currentPlayer].isInvulnerable = true;
+    //     this._updateStateToPlayers();
+    //     this._disableInput(currentPlayer);
+    //     setTimeout(() => {
+    //       this._enableInput(currentPlayer);
+    //       this.boardState[currentPlayer].isInvulnerable = false;
+    //       this._updateStateToPlayers();
+    //     }, 2000);
+    //     break;
+    //   default:
+    //     break;
+    // }
   }
 
   update(text: string) {
@@ -125,12 +172,13 @@ export default class TypeBattleGame {
 
   _updateStateToPlayers() {
     this._players.forEach((player) => {
-      player.emit('state', this.currentState);
+      player.emit('state', this.boardState);
     });
+    this._checkGameOver();
   }
 
   _sendToPlayer(playerIndex: number, msg: string) {
-    msg = `Player ${playerIndex+1}: ${msg}`
+    msg = `Player ${playerIndex + 1}: ${msg}`
     this._players[playerIndex].emit('message', msg);
   }
 
@@ -155,11 +203,11 @@ export default class TypeBattleGame {
       this._sendWinMessage(winner, loser);
     }
 
-    if (this.currentState['Player1']['hp'] <= 0) {
+    if (this.boardState['Player1']['hp'] <= 0) {
       let winner = this._players[1];
       let loser = this._players[0];
       endGame(winner, loser);
-    } else if (this.currentState['Player2']['hp'] <= 0) {
+    } else if (this.boardState['Player2']['hp'] <= 0) {
       let winner = this._players[0];
       let loser = this._players[1];
       endGame(winner, loser);
@@ -167,11 +215,11 @@ export default class TypeBattleGame {
   }
 
   _disableInput(player: PlayerString) {
-    this.currentState[player]['disabled'] = true;
+    this.boardState[player]['disabled'] = true;
   }
 
   _enableInput(player: PlayerString) {
-    this.currentState[player]['disabled'] = false;
+    this.boardState[player]['disabled'] = false;
   }
 
   _sendWinMessage(winner: socketio.Socket, loser: socketio.Socket) {
