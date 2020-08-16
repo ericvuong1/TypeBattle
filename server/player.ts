@@ -1,18 +1,17 @@
-import { BoardState } from './typebattle-game'
+import { Spell } from './typebattle-game'
 export default class Player {
     hp: number
     name: string
     disabled: boolean
     isInvulnerable: boolean
-    counterAttack: (() => null) | null // trigger a function
-
+    counterAttackSpell: Spell | undefined 
 
     constructor(hp: number, name: string) {
         this.hp = hp;
         this.name = name;
         this.disabled = false;
         this.isInvulnerable = false;
-        this.counterAttack = null;
+        this.counterAttackSpell = undefined;
     }
 }
 

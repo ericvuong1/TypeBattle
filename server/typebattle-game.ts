@@ -7,7 +7,7 @@ import socketio from 'socket.io';
 // const spells: Spell[] = require('spells.json')['spells'];
 import { spells } from './spells.json';
 
-interface Spell {
+export type Spell = {
   name: string
   damage: number
   selfDamage: number
@@ -16,7 +16,8 @@ interface Spell {
   stunTime: number
   invulnerabilityTime: number
   overtimeDamage: number
-  overTimeDamageDuration: number
+  overTimeDamageDuration: number,
+  counterAttackSpell: string | null
 }
 
 type PlayerString = "Player1" | "Player2"
@@ -76,13 +77,11 @@ export default class TypeBattleGame {
     if (this.boardState[attackedPlayer].isInvulnerable) {
       // Calling counter attack
       // TODO: Do counter attack properly
-      // this.boardState[attackedPlayer]['counterAttack']!(); 
-      this._disableInput(currentPlayer)
-
-      setTimeout(() => {
-        this._enableInput(currentPlayer);
-        this._updateStateToPlayers();
-      }, 3000);
+      console.log("Counter Attacking!");
+      const counterSpell = this.boardState[attackedPlayer]['counterAttackSpell']
+      if (counterSpell !== undefined) {
+        this._processSpell(attackedPlayer, counterSpell);
+      }
     }
     else {
       this.boardState[attackedPlayer]['hp'] -= damage;
@@ -91,7 +90,7 @@ export default class TypeBattleGame {
     this._updateStateToPlayers();
   }
   _updateGameState(currentPlayer: PlayerString, msg: string) {
-    const spell: Spell | undefined = spells.find((s: Spell) => s['name'] === msg);
+    const spell: Spell | undefined = spells.find((s: Spell) => s["name"] === msg);
     spell && this._processSpell(currentPlayer, spell);
   }
 
@@ -105,8 +104,8 @@ export default class TypeBattleGame {
     invincible ? this._disableInput(player) : this._enableInput(player);
   }
 
-  _processSpell(currentPlayer: PlayerString, spell: Spell): void {
-    let otherPlayer = this.otherPlayer(currentPlayer);;
+  _processSpell(attacker: PlayerString, spell: Spell): void {
+    let attacked = this.otherPlayer(attacker);;
     const damage = spell['damage'];
     const selfDamage = spell["selfDamage"];
     const delayTimeDamage = spell["delayTimeDamage"];
@@ -115,14 +114,20 @@ export default class TypeBattleGame {
     const invulnerabilityTime = spell["invulnerabilityTime"];
     const overtimeDamage = spell["overtimeDamage"];
     const overTimeDamageDuration = spell["overTimeDamageDuration"];
+    let counterAttackSpellString = spell["counterAttackSpell"];
+    let counterAttackSpell: Spell | undefined = undefined;
+    if (counterAttackSpellString !== undefined) {
+      counterAttackSpell = spells.find((s: Spell) => s['name'] === counterAttackSpellString);
+    }
+    this.boardState[attacker]['counterAttackSpell'] = counterAttackSpell;
 
     // TODO: manage cooldowns?
 
     // Disable players in invulnerability mode
     if (invulnerabilityTime > 0) {
-      this._setInvulnerable(currentPlayer, true)
+      this._setInvulnerable(attacker, true)
       setTimeout(() => {
-        this._setInvulnerable(currentPlayer, false);
+        this._setInvulnerable(attacker, false);
         this._updateStateToPlayers();
         this._checkGameOver();
       }, invulnerabilityTime);
@@ -130,10 +135,10 @@ export default class TypeBattleGame {
 
     // Damage will be delayed
     if (delayTimeDamage > 0) {
-      this._disableInput(currentPlayer);
+      this._disableInput(attacker);
       setTimeout(() => {
-        this._enableInput(currentPlayer);
-        this._attemptAttackPlayer(otherPlayer, spell);
+        this._enableInput(attacker);
+        this._attemptAttackPlayer(attacked, spell);
       }, delayTimeDamage);
     }
     this._updateStateToPlayers();
@@ -162,7 +167,6 @@ export default class TypeBattleGame {
 
   update(text: string) {
     let textSplit = text.split(": ");
-    let sender: string;
     if (textSplit[0] === 'Player1' || textSplit[0] === 'Player2') {
       const attacker: PlayerString = textSplit[0];
       const msg: string = textSplit[1];

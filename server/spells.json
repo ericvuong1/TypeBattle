@@ -9,7 +9,8 @@
             "stunTime": 0,
             "invulnerabilityTime": 0,
             "overtimeDamage": 0,
-            "overTimeDamageDuration": 0
+            "overTimeDamageDuration": 0,
+            "counterAttackSpell": null 
         },
         {
             "name": "Heal",
@@ -20,7 +21,8 @@
             "stunTime": 0,
             "invulnerabilityTime": 0,
             "overtimeDamage": 0,
-            "overTimeDamageDuration": 0
+            "overTimeDamageDuration": 0,
+            "counterAttackSpell": null 
         },
         {
             "name": "Block",
@@ -31,7 +33,8 @@
             "stunTime": 3000, 
             "invulnerabilityTime": 3000,
             "overtimeDamage": 0,
-            "overTimeDamageDuration": 0
+            "overTimeDamageDuration": 0,
+            "counterAttackSpell": "Stun"
         },
         {            
             "name": "Fire Ball",
@@ -42,7 +45,8 @@
             "stunTime": 0, 
             "invulnerabilityTime": 0,
             "overtimeDamage": 0,
-            "overTimeDamageDuration": 0
+            "overTimeDamageDuration": 0,
+            "counterAttackSpell": null
         },
         {            
             "name": "Poison Breath",
@@ -53,7 +57,20 @@
             "stunTime": 0, 
             "invulnerabilityTime": 0,
             "overtimeDamage": 40,
-            "overTimeDamageDuration": 10000
+            "overTimeDamageDuration": 10000,
+            "counterAttackSpell": null
+        },
+        {
+            "name": "Stun",
+            "damage": 0,
+            "selfDamage": 0,
+            "delayTimeDamage": 0,
+            "cooldownTime": 0,
+            "stunTime": 3000,
+            "invulnerabilityTime": 0,
+            "overtimeDamage": 0,
+            "overTimeDamageDuration": 0,
+            "counterAttackSpell": null
         }
     ]
 }
