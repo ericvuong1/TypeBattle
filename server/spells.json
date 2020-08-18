@@ -1,0 +1,76 @@
+{
+    "spells": [
+        {
+            "name": "Quick Attack",
+            "damage": 10,
+            "selfDamage": 0,
+            "delayTimeDamage": 200,
+            "cooldownTime": 1000,
+            "stunTime": 0,
+            "invulnerabilityTime": 0,
+            "overtimeDamage": 0,
+            "overTimeDamageDuration": 0,
+            "counterAttackSpell": null 
+        },
+        {
+            "name": "Heal",
+            "damage": 0,
+            "selfDamage": -30,
+            "delayTimeDamage": 1000,
+            "cooldownTime": 10000,
+            "stunTime": 0,
+            "invulnerabilityTime": 0,
+            "overtimeDamage": 0,
+            "overTimeDamageDuration": 0,
+            "counterAttackSpell": null 
+        },
+        {
+            "name": "Block",
+            "damage": 0,
+            "selfDamage": 0,
+            "delayTimeDamage": 0,
+            "cooldownTime": 10000,
+            "stunTime": 3000, 
+            "invulnerabilityTime": 3000,
+            "overtimeDamage": 0,
+            "overTimeDamageDuration": 0,
+            "counterAttackSpell": "Stun"
+        },
+        {            
+            "name": "Fire Ball",
+            "damage": 40,
+            "selfDamage": -10,
+            "delayTimeDamage": 3000,
+            "cooldownTime": 10000,
+            "stunTime": 0, 
+            "invulnerabilityTime": 0,
+            "overtimeDamage": 0,
+            "overTimeDamageDuration": 0,
+            "counterAttackSpell": null
+        },
+        {            
+            "name": "Poison Breath",
+            "damage": 0,
+            "selfDamage": 0,
+            "delayTimeDamage": 500,
+            "cooldownTime": 15000,
+            "stunTime": 0, 
+            "invulnerabilityTime": 0,
+            "overtimeDamage": 40,
+            "overTimeDamageDuration": 10000,
+            "counterAttackSpell": null
+        },
+        {
+            "name": "Stun",
+            "damage": 0,
+            "selfDamage": 0,
+            "delayTimeDamage": 0,
+            "cooldownTime": 0,
+            "stunTime": 3000,
+            "invulnerabilityTime": 0,
+            "overtimeDamage": 0,
+            "overTimeDamageDuration": 0,
+            "counterAttackSpell": null
+        }
+    ]
+}
