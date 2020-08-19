@@ -1,13 +1,13 @@
 import React from "react";
 
-interface Props {}
+import "./ChatLogDisplay.css";
 
-const ChatLogDisplay: React.FC<Props> = () => {
-  return (
-    <div>
-      <p>hello TypeBattle</p>
-    </div>
-  );
+interface Props {
+  playerInput: string;
+}
+
+const ChatLogDisplay: React.FC<Props> = (playerInput) => {
+  return <div className="PlayerInputLog">{playerInput.playerInput}</div>;
 };
 
 export default ChatLogDisplay;

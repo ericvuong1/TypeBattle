@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import GameplayContainer from "../GameplayContainer/GameplayContainer";
 
 import io from "socket.io-client";
@@ -9,9 +9,9 @@ function GamePage(): JSX.Element {
   let [info, setInfo] = useState<string>("");
   let [messages, setMessages] = useState<string[]>([]);
   let [state, setState] = useState({});
-  let [playerInputSkill, setPlayerInputSkill] = useState<string>("");
+  let [playerInputSkill, setPlayerInputSkill] = useState<string>(""); // use useRef
 
-  //socket.on("message", (text: string) => setMessages([...messages, text]));
+  socket.on("message", (text: string) => setMessages([...messages, text]));
   socket.on("info", (text: string) => setInfo(text));
   socket.on("state", (text: string) => setState(text));
 
@@ -20,25 +20,27 @@ function GamePage(): JSX.Element {
   ) => {
     const { value } = event.target;
     setPlayerInputSkill((playerInputSkill) => (playerInputSkill = value));
-    console.log(playerInputSkill);
+    //console.log(playerInputSkill);
   };
 
   const onEnterKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      //Rename Messages to setSkillUse?
-      socket.send("message", (playerInputSkill: string) =>
-        setMessages([...messages, playerInputSkill])
-      );
-      //reset input textbox value to none, need to add cooldown timer
+    if (event.key === "Enter" && playerInputSkill !== "") {
+      const messageToSend = `${info}: ${playerInputSkill}`;
+      socket.send(messageToSend);
+
+      //reset input textbox value, need to add cooldown timer
       setPlayerInputSkill((playerInputSkill) => (playerInputSkill = ""));
     }
   };
+
   return (
     <div>
+      <h1>Typebattle</h1>
       <GameplayContainer
         value={playerInputSkill}
         inputChange={onPlayerCommandSubmit}
         onEnterKeyPress={onEnterKeyPress}
+        messages={messages}
       />
       <header>{info}</header>
       <header>{messages}</header>

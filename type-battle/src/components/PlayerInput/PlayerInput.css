@@ -1,0 +1,27 @@
+.PlayerInputBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid black;
+  border-radius: 2rem;
+}
+
+.PlayerInputBox input {
+  padding: 1rem;
+  width: 70%;
+  border: none;
+  background: none;
+}
+.PlayerInputBox input:focus {
+  outline: none;
+}
+
+.EnterButton {
+  width: 20%;
+  height: auto;
+  border: 1px solid rgb(3, 255, 255);
+  background-color: rgb(3, 255, 255);
+  padding: 0.8rem;
+  border-radius: 2rem;
+  text-align: center;
+}
