@@ -87,7 +87,7 @@ export default class TypeBattleGame {
       this.boardState[attackedPlayer]['hp'] -= damage;
       this.boardState[currentPlayer]['hp'] -= selfDamage;
     }
-    this._updateStateToPlayers();
+    this._updateStateToPlayersAndCheckGameOver();
   }
   _updateGameState(currentPlayer: PlayerString, msg: string) {
     const spell: Spell | undefined = spells.find((s: Spell) => s["name"] === msg);
@@ -128,7 +128,7 @@ export default class TypeBattleGame {
       this._setInvulnerable(attacker, true)
       setTimeout(() => {
         this._setInvulnerable(attacker, false);
-        this._updateStateToPlayers();
+        this._updateStateToPlayersAndCheckGameOver();
         this._checkGameOver();
       }, invulnerabilityTime);
     }
@@ -141,7 +141,7 @@ export default class TypeBattleGame {
         this._attemptAttackPlayer(attacked, spell);
       }, delayTimeDamage);
     }
-    this._updateStateToPlayers();
+    this._updateStateToPlayersAndCheckGameOver();
 
     // TODO: move away from this switch case statement
     // switch (spell['name']) {
@@ -174,11 +174,17 @@ export default class TypeBattleGame {
     }
   }
 
-  _updateStateToPlayers() {
+  _updateStateToPlayersAndCheckGameOver() {
     this._players.forEach((player) => {
       player.emit('state', this.boardState);
     });
     this._checkGameOver();
+  }
+
+  _updateStateToPlayers() {
+    this._players.forEach((player) => {
+      player.emit('state', this.boardState);
+    });
   }
 
   _sendToPlayer(playerIndex: number, msg: string) {
