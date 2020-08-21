@@ -27,7 +27,7 @@ function GamePage(): JSX.Element {
     if (event.key === "Enter" && playerInputSkill !== "") {
       const messageToSend = `${info}: ${playerInputSkill}`;
       socket.send(messageToSend);
-
+      console.log(state);
       //reset input textbox value, need to add cooldown timer
       setPlayerInputSkill((playerInputSkill) => (playerInputSkill = ""));
     }

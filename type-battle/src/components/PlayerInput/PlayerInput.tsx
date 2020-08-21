@@ -26,6 +26,13 @@ const useStyles = makeStyles((theme: Theme) =>
       "&.Mui-focused fieldset": {
         border: "none",
       },
+      "&.Mui-hover fieldset": {
+        border: "none",
+      },
+    },
+    button: {
+      backgroundColor: "rgb(0, 162, 255)",
+      borderRadius: "0.5rem",
     },
   })
 );
@@ -48,7 +55,7 @@ const PlayerInput: React.FC<Props> = ({
           className: classes.input,
         }}
       ></TextField>
-      <Button variant="contained" color="primary">
+      <Button className={classes.button} variant="contained">
         Enter
       </Button>
     </div>
