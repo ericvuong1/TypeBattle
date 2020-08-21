@@ -1,6 +1,7 @@
 import React from "react";
-
-import "./PlayerInput.css";
+import { createStyles, makeStyles, Theme } from "@material-ui/core/styles";
+import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
 
 interface Props {
   value: string;
@@ -8,22 +9,48 @@ interface Props {
   onEnterKeyPress: (event: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    PlayerInputBox: {
+      width: "100%",
+      border: "1px solid black",
+      borderRadius: "0.5rem",
+      background: "none",
+      display: "flex",
+    },
+    input: {
+      "&.MuiOutlinedInput-root": {
+        border: "none",
+        width: "20rem",
+      },
+      "&.Mui-focused fieldset": {
+        border: "none",
+      },
+    },
+  })
+);
+
 const PlayerInput: React.FC<Props> = ({
   value,
   playerInputChange,
   onEnterKeyPress,
 }) => {
+  const classes = useStyles();
   return (
-    <div className="PlayerInputBox">
-      <input
-        type="text"
+    <div className={classes.PlayerInputBox}>
+      <TextField
         value={value}
+        variant="outlined"
         onChange={playerInputChange}
-        placeholder="Enter Attack Command"
         onKeyPress={onEnterKeyPress}
-        maxLength={30}
-      ></input>
-      <div className="EnterButton">Enter</div>
+        placeholder="Enter Command"
+        InputProps={{
+          className: classes.input,
+        }}
+      ></TextField>
+      <Button variant="contained" color="primary">
+        Enter
+      </Button>
     </div>
   );
 };
