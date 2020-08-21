@@ -19,35 +19,35 @@ const GameComponent = (): JSX.Element => {
     socket.on('info', (text: string) => setInfo(text));
     socket.on('state', (text: string) => setState(text));
     socket.on('message', (text: string) => {
-      console.log(text, '456');
       messages = [...messages, text]
-      console.log(messages, '789');
     });
   }, []);
 
-
-  const attack = (): void => {
-    const message = `${info}: Quick Attack`;
-    console.log(message);
-    socket.emit('message', message);
-    socket.emit('update', message);
+  const castSpell = (spell: string) => {return function() {
+      const message = `${info}: ${spell}`;
+      console.log(message);
+      socket.emit('message', message);
+      socket.emit('update', message);
+    }
   }
   console.log('loaded')
 
   return (
     <div>
+      <li>
+        {messages.map((e,i) => {
+          return (<ul key={i}>{e}</ul>)
+        })}
+      </li>
       <header>{info}</header>
-      <header>{messages}</header>
       <header>{JSON.stringify(state)}</header>
-      <button onClick={attack}>hi</button>
+      <button onClick={castSpell('Quick Attack')}>Quick Attack</button>
+      <button onClick={castSpell('Block')}>Block</button>
     </div>
   )
 }
 
 function App(): JSX.Element {
-
-
-
   return (
     <div className="App">
       <header className="App-header">
