@@ -1,7 +1,7 @@
 /**
  * WELCOME TO MY GOD CLASS
  */
-import Player from './player';
+import Player, { CounterSpell } from './types';
 import socketio from 'socket.io';
 
 // const spells: Spell[] = require('spells.json')['spells'];
@@ -18,7 +18,7 @@ export type Spell = {
   overtimeDamage: number
   overTimeDamageDuration: number,
   counterAttackSpell: string | null
-  // priority: number
+  priority: number
 }
 
 type PlayerString = "Player1" | "Player2"
@@ -79,9 +79,9 @@ export default class TypeBattleGame {
       // Calling counter attack
       // TODO: Do counter attack properly
       console.log("Counter Attacking!");
-      const counterSpell = this.boardState[attackedPlayer]['counterAttackSpell']
+      const counterSpell: CounterSpell | undefined = this.boardState[attackedPlayer]['counterAttackSpell']
       if (counterSpell !== undefined) {
-        this._processSpell(attackedPlayer, counterSpell);
+        this._processSpell(attackedPlayer, counterSpell['spell']);
       }
     }
     else {
@@ -91,7 +91,7 @@ export default class TypeBattleGame {
     this._updateStateToPlayersAndCheckGameOver();
   }
   _updateGameState(currentPlayer: PlayerString, msg: string) {
-    const spell: Spell | undefined = spells.find((s: Spell) => s["name"] === msg);
+    const spell: Spell | undefined = this._getSpell(msg);
     spell && this._processSpell(currentPlayer, spell);
   }
 
@@ -105,6 +105,10 @@ export default class TypeBattleGame {
     invincible ? this._disableInput(player) : this._enableInput(player);
   }
 
+  _getSpell(spellString: string | null): Spell | undefined {
+    return spellString === null ? undefined : spells.find((s: Spell) => s['name'] === spellString)
+  }
+
   _processSpell(attacker: PlayerString, spell: Spell): void {
     let attacked = this.otherPlayer(attacker);;
     const damage = spell['damage'];
@@ -115,12 +119,12 @@ export default class TypeBattleGame {
     const invulnerabilityTime = spell["invulnerabilityTime"];
     const overtimeDamage = spell["overtimeDamage"];
     const overTimeDamageDuration = spell["overTimeDamageDuration"];
+    const priority = spell["priority"];
+
     let counterAttackSpellString = spell["counterAttackSpell"];
-    let counterAttackSpell: Spell | undefined = undefined;
-    if (counterAttackSpellString !== undefined) {
-      counterAttackSpell = spells.find((s: Spell) => s['name'] === counterAttackSpellString);
-    }
-    this.boardState[attacker]['counterAttackSpell'] = counterAttackSpell;
+    const counterAttackSpell = this._getSpell(counterAttackSpellString);
+    counterAttackSpell && (this.boardState[attacker]['counterAttackSpell']
+      = new CounterSpell(priority, counterAttackSpell));
 
     // TODO: manage cooldowns?
 

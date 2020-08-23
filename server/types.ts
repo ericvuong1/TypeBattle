@@ -4,8 +4,7 @@ export default class Player {
     name: string
     disabled: boolean
     isInvulnerable: boolean
-    counterAttackSpell: Spell | undefined 
-    // spellQueue: Spell | undefined
+    counterAttackSpell: CounterSpell | undefined 
 
     constructor(hp: number, name: string) {
         this.hp = hp;
@@ -13,7 +12,16 @@ export default class Player {
         this.disabled = false;
         this.isInvulnerable = false;
         this.counterAttackSpell = undefined;
-        // this.spellQueue = undefined;
+    }
+}
+
+export class CounterSpell {
+    priority: number
+    spell: Spell
+
+    constructor(priority: number, spell: Spell) {
+        this.priority = priority;
+        this.spell = spell;
     }
 }
 
