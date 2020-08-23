@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import GameplayContainer from "../GameplayContainer/GameplayContainer";
+import PlayerHP from "../PlayerHp/PlayerHP";
 
 import io from "socket.io-client";
 
@@ -35,15 +36,15 @@ function GamePage(): JSX.Element {
   return (
     <div>
       <h1>Typebattle</h1>
-      <GameplayContainer
-        value={playerInputSkill}
-        inputChange={onPlayerCommandSubmit}
-        onEnterKeyPress={onEnterKeyPress}
-        messages={messages}
-      />
-      <header>{info}</header>
-      <header>{messages}</header>
-      <header>{JSON.stringify(state)}</header>
+      <div>
+        <GameplayContainer
+          value={playerInputSkill}
+          inputChange={onPlayerCommandSubmit}
+          onEnterKeyPress={onEnterKeyPress}
+          messages={messages}
+        />
+        <PlayerHP playerState={state} />
+      </div>
     </div>
   );
 }
