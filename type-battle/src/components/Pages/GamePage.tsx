@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import GameplayContainer from "../GameplayContainer/GameplayContainer";
 
 import io from "socket.io-client";
@@ -20,14 +20,13 @@ function GamePage(): JSX.Element {
   ) => {
     const { value } = event.target;
     setPlayerInputSkill((playerInputSkill) => (playerInputSkill = value));
-    //console.log(playerInputSkill);
   };
 
   const onEnterKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && playerInputSkill !== "") {
       const messageToSend = `${info}: ${playerInputSkill}`;
       socket.send(messageToSend);
-      console.log(state);
+
       //reset input textbox value, need to add cooldown timer
       setPlayerInputSkill((playerInputSkill) => (playerInputSkill = ""));
     }

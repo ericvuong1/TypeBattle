@@ -26,9 +26,6 @@ const useStyles = makeStyles((theme: Theme) =>
       "&.Mui-focused fieldset": {
         border: "none",
       },
-      "&.Mui-hover fieldset": {
-        border: "none",
-      },
     },
     button: {
       backgroundColor: "rgb(0, 162, 255)",
@@ -51,6 +48,7 @@ const PlayerInput: React.FC<Props> = ({
         onChange={playerInputChange}
         onKeyPress={onEnterKeyPress}
         placeholder="Enter Command"
+        inputProps={{ maxLength: 30 }}
         InputProps={{
           className: classes.input,
         }}
