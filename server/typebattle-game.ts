@@ -18,6 +18,7 @@ export type Spell = {
   overtimeDamage: number
   overTimeDamageDuration: number,
   counterAttackSpell: string | null
+  // priority: number
 }
 
 type PlayerString = "Player1" | "Player2"
