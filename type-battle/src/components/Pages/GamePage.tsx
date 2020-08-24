@@ -1,20 +1,30 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import GameplayContainer from "../GameplayContainer/GameplayContainer";
 import PlayerHP from "../PlayerHp/PlayerHP";
+import { BoardState } from "../Type/Type";
 
 import io from "socket.io-client";
 
 const socket = io("http://localhost:8080");
 
+// TODO: Why put it outside function works?
+let messages: string[] = [];
+
 function GamePage(): JSX.Element {
-  let [info, setInfo] = useState<string>("");
-  let [messages, setMessages] = useState<string[]>([]);
-  let [state, setState] = useState({});
+  // let [messages, setMessages] = useState<string[]>([]);
+  let [info, setInfo] = useState<"Player1" | "Player2" | "Player?">("Player?");
+  let [state, setState] = useState<BoardState | undefined>(undefined);
   let [playerInputSkill, setPlayerInputSkill] = useState<string>(""); // use useRef
 
-  socket.on("message", (text: string) => setMessages([...messages, text]));
-  socket.on("info", (text: string) => setInfo(text));
-  socket.on("state", (text: string) => setState(text));
+  useEffect(() => {
+    socket.on("info", (currentPlayer: "Player1" | "Player2") =>
+      setInfo(currentPlayer)
+    );
+    socket.on("state", (boardState: BoardState) => setState(boardState));
+    socket.on("message", (text: string) => {
+      messages = [...messages, text];
+    });
+  }, []);
 
   const onPlayerCommandSubmit = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -26,10 +36,13 @@ function GamePage(): JSX.Element {
   const onEnterKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && playerInputSkill !== "") {
       const messageToSend = `${info}: ${playerInputSkill}`;
-      socket.send(messageToSend);
+      socket.emit("message", messageToSend);
+      socket.emit("update", messageToSend);
+      console.log("567");
 
       //reset input textbox value, need to add cooldown timer
       setPlayerInputSkill((playerInputSkill) => (playerInputSkill = ""));
+      console.log("reset");
     }
   };
 
@@ -43,7 +56,7 @@ function GamePage(): JSX.Element {
           onEnterKeyPress={onEnterKeyPress}
           messages={messages}
         />
-        <PlayerHP playerState={state} />
+        <PlayerHP playerState={state} playerInfo={info} />
       </div>
     </div>
   );

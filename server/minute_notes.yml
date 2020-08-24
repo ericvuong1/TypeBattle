@@ -1,0 +1,125 @@
+"Player1": {"hp":100,"name":"Player1","disabled":false,"isBlocking":false}
+"Player2": {"hp":100,"name":"Player2","disabled":false,"isBlocking":false}
+
+Interface Spell {
+	name: string
+	damage: int
+	selfDamage: int
+	cooldownTime: int
+	blockTime: int
+	invulnerabilityTime: int
+	delayTime: int
+}
+                        _____ updateboard -> result
+                       /
+                  ___ updateboard -> result
+                 /
+msg -> spell -> board(spell) -> result
+       block    updatBoard(cancelBlock)
+                                disable currentUser
+                                set isBlocking
+                                onBlockSuccessTrigger ?
+
+client -> text -> process_text(text)
+                            user
+                            msg
+                             process_msg(msg)
+                             -> Chat
+                                ->emit('message', msg)
+                             -> Spell
+                              -> process_spell(spell)
+                              ->
+
+// code
+import spells from spells.json
+update(msg) {
+	let [attacker, spell] = msg.split(": ")
+	let otherPlayer = this.otherPlayer(attacker);
+	spell = processSpell(msg);
+	board = processBoard(spell);
+	this.board.update(board)
+}
+function processSpell(msg: string) -> Spell? {
+	let spell = spells[spell];
+	return spell;
+}
+
+function damagePlayer(damage) {
+	if (this.currentPlayer.isDisabled){ return; }
+	do damage
+}
+
+function processBoard(spell: Spell) -> Board {
+	const damage = spell['damage'];
+	const selfDamage = spell['selfDamage']:
+	const delayTime = spell['delayTime'];
+	updateBoard(disableAttacker(delayTime));
+	setTimeInterval(() => {
+		updateBoard(damagePlayer(damage))
+	}, delayTime);
+}
+
+Block
+Attack 
+Charge Attack
+Stun
+Heal
+Poison
+
+PlayerSpell {
+  name: string
+  isOnCDR: boolean
+}
+
+Time in milliseconds
+
+processSpell(spell: Spell)
+
+spell.json
+[
+{
+	"name": "Quick Attack",
+	"damage": 10,
+	"selfDamage": 0,
+	"delayTimeDamage": 200,
+	"cooldownTime": 1000,
+	"stunTime": 0,
+	"invulnerabilityTime": 0,
+},
+{
+	"name": "Heal",
+	"damage": 0,
+	"selfDamage": -30,
+	"cooldown": 10000,
+	"invulnerabilityTime": 0,
+},
+{
+	"name": "Block",
+	"damage": 0,
+	"selfDamage": 0,
+	"cooldown": 5000,
+	"blockTime":'
+}
+
+]
+
+Interface Spell:
+
+Interface Element
+
+   look up json? look up json ?
+ f(spell) -> f(currentState) -> result?
+
+
+
+
+
+
+
+
+
+
+
+
+
+

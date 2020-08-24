@@ -1,12 +1,12 @@
-const http = require('http');
-const express = require('express');
-const socketio = require('socket.io');
+import http from 'http';
+import express from 'express';
+import socketio from 'socket.io';
 
-const TypeBattleGame = require('./typebattle-game');
+import TypeBattleGame from './typebattle-game'
 
 const app = express();
 
-const clientPath = `${__dirname}/../client`;
+const clientPath = `${__dirname}/../../client`;
 console.log(`Serving static from ${clientPath}`);
 
 app.use(express.static(clientPath));
@@ -15,8 +15,8 @@ const server = http.createServer(app);
 
 const io = socketio(server);
 
-let waitingPlayer = null;
-let game = null;
+let waitingPlayer: socketio.Socket | null = null;
+let game: TypeBattleGame | null = null;
 
 /*
 io events:
@@ -29,7 +29,7 @@ update -> update state
 io.on('connection', (sock) => {
     if (waitingPlayer) {
       game = new TypeBattleGame(waitingPlayer, sock);
-      let currentState = game.currentState;
+      let currentState = game.boardState;
       console.log(currentState)
 
       sock.emit('info', 'Player2');
