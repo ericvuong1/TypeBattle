@@ -19,19 +19,18 @@ const PlayerHP: React.FC<Props> = ({ playerRemainingHealth }) => {
   const classes = useStyles();
 
   return (
-    <div>
+    <div style={{ display: "flex" }}>
       <div className={classes.playerhpbar}>
         <div
           style={{
             width: `${playerRemainingHealth}%`,
-            height: "20px",
+            height: "21px",
             backgroundColor: "green",
             borderRadius: "5px",
           }}
-        >
-          {playerRemainingHealth}
-        </div>
+        ></div>
       </div>
+      {playerRemainingHealth}
     </div>
   );
 };

@@ -34,6 +34,10 @@ const useStyles = makeStyles(() =>
   })
 );
 
+const disableCopyPaste = (event: React.ClipboardEvent) => {
+  event.preventDefault();
+};
+
 const PlayerInput: React.FC<Props> = ({
   value,
   playerInputChange,
@@ -52,6 +56,8 @@ const PlayerInput: React.FC<Props> = ({
         InputProps={{
           className: classes.input,
         }}
+        onCopy={disableCopyPaste}
+        onPaste={disableCopyPaste}
       ></TextField>
       <Button className={classes.button} variant="contained">
         Enter
