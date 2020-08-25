@@ -27,6 +27,7 @@ const useStyles = makeStyles(() =>
       border: "2px solid rgb(0, 162, 255)",
       borderRadius: "0.5rem",
       overflow: "auto",
+      marginBottom: "1.5rem",
     },
   })
 );

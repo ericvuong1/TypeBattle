@@ -1,4 +1,4 @@
-export type Player = {
+export type PlayerInfo = {
   hp: number;
   name: string;
   disabled: boolean;
@@ -7,6 +7,6 @@ export type Player = {
 };
 
 export type BoardState = {
-  Player1: Player;
-  Player2: Player;
+  Player1: PlayerInfo;
+  Player2: PlayerInfo;
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import GameplayContainer from "../GameplayContainer/GameplayContainer";
-import PlayerHP from "../PlayerHp/PlayerHP";
+import Player from "../Player/Player";
 import { BoardState } from "../Type/Type";
 
 import io from "socket.io-client";
@@ -11,8 +11,7 @@ const socket = io("http://localhost:8080");
 let messages: string[] = [];
 
 function GamePage(): JSX.Element {
-  // let [messages, setMessages] = useState<string[]>([]);
-  let [info, setInfo] = useState<"Player1" | "Player2" | "Player?">("Player?");
+  let [info, setInfo] = useState<"Player1" | "Player2" | "Player?">("Player?"); //TODO: how to show player 2? can we use info?
   let [state, setState] = useState<BoardState | undefined>(undefined);
   let [playerInputSkill, setPlayerInputSkill] = useState<string>(""); // use useRef
 
@@ -38,7 +37,7 @@ function GamePage(): JSX.Element {
       const messageToSend = `${info}: ${playerInputSkill}`;
       socket.emit("message", messageToSend);
       socket.emit("update", messageToSend);
-      console.log("567");
+      //console.log("567");
 
       //reset input textbox value, need to add cooldown timer
       setPlayerInputSkill((playerInputSkill) => (playerInputSkill = ""));
@@ -49,14 +48,15 @@ function GamePage(): JSX.Element {
   return (
     <div>
       <h1>Typebattle</h1>
-      <div>
+      <div style={{ display: "flex" }}>
+        <Player playerState={state?.Player1} playerInfo={info} />
         <GameplayContainer
           value={playerInputSkill}
           inputChange={onPlayerCommandSubmit}
           onEnterKeyPress={onEnterKeyPress}
           messages={messages}
         />
-        <PlayerHP playerState={state} playerInfo={info} />
+        <Player playerState={state?.Player2} playerInfo={info} />
       </div>
     </div>
   );
