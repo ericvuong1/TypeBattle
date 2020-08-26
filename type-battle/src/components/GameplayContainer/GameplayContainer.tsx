@@ -1,6 +1,7 @@
 import React from "react";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
-
+import GridList from "@material-ui/core/GridList";
+import GridListTile from "@material-ui/core/GridListTile";
 import ChatLogDisplay from "../ChatLogDisplay/ChatLogDisplay";
 import PlayerInput from "../PlayerInput/PlayerInput";
 
@@ -32,6 +33,14 @@ const useStyles = makeStyles(() =>
   })
 );
 
+const availableSkills = (
+  <GridList>
+    <GridListTile>
+      <p>Quick Attack</p>
+    </GridListTile>
+  </GridList>
+);
+
 const GameplayContainer: React.FC<Props> = ({
   value,
   inputChange,
@@ -51,6 +60,7 @@ const GameplayContainer: React.FC<Props> = ({
         playerInputChange={inputChange}
         onEnterKeyPress={onEnterKeyPress}
       />
+      {availableSkills}
     </div>
   );
 };

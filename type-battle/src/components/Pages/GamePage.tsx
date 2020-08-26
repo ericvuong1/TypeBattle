@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import GameplayContainer from "../GameplayContainer/GameplayContainer";
 import Player from "../Player/Player";
 import { BoardState } from "../Type/Type";
+import Divider from "@material-ui/core/Divider";
 
 import io from "socket.io-client";
 
@@ -48,7 +49,15 @@ function GamePage(): JSX.Element {
   return (
     <div>
       <h1>Typebattle</h1>
-      <div style={{ display: "flex" }}>
+      <Divider />
+      <div
+        style={{
+          display: "flex",
+          marginTop: "2rem",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
         <Player playerState={state?.Player1} />
         <GameplayContainer
           value={playerInputSkill}

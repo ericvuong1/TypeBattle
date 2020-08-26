@@ -11,6 +11,7 @@ const useStyles = makeStyles(() =>
       width: "500px",
       backgroundColor: "red",
       borderRadius: "5px",
+      margin: "1rem 0",
     },
   })
 );
