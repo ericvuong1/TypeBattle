@@ -29,6 +29,12 @@ function GamePage(): JSX.Element {
     });
   }, []);
 
+  const chatDisplayScrollToBottom = () => {
+    let chatBoxElement = document.getElementById("scrolltobottom");
+    // @ts-ignore
+    chatBoxElement.scrollTop = chatBoxElement.scrollHeight;
+  };
+
   const onPlayerCommandSubmit = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -42,13 +48,13 @@ function GamePage(): JSX.Element {
       socket.emit("message", messageToSend);
       socket.emit("update", messageToSend);
       //console.log("567");
-
+      chatDisplayScrollToBottom();
       //reset input textbox value, need to add cooldown timer
       setPlayerInputSkill((playerInputSkill) => (playerInputSkill = ""));
       //console.log("reset");
     }
   };
-  //TODO: how to identify which player is you and which one is the enemy
+
   let currentPlayer: PlayerInfo | undefined | false =
     state && info !== "Player?" && state[info];
   let enemyPlayer: PlayerInfo | undefined | false =

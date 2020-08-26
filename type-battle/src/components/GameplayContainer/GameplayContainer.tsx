@@ -50,7 +50,7 @@ const GameplayContainer: React.FC<Props> = ({
   const classes = useStyles();
   return (
     <div className={classes.gameplayContainer}>
-      <div className={classes.chatLogContainer}>
+      <div className={classes.chatLogContainer} id="scrolltobottom">
         {messages.map((playerInput: string, index) => (
           <ChatLogDisplay playerInput={playerInput} key={index} />
         ))}
