@@ -3,7 +3,7 @@ import { PlayerInfo } from "../Type/Type";
 import PlayerHp from "../PlayerHp/PlayerHP";
 
 interface Props {
-  playerState: PlayerInfo | undefined;
+  playerState: PlayerInfo | undefined | false;
 }
 
 const Player: React.FC<Props> = ({ playerState }) => {
