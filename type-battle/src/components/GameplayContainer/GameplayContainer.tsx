@@ -18,7 +18,7 @@ const useStyles = makeStyles(() =>
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      height: "350px",
+      height: "500px",
       width: "400px",
       margin: "auto",
     },
@@ -33,11 +33,17 @@ const useStyles = makeStyles(() =>
 );
 
 const availableSkills = (
-  <GridList>
-    <GridListTile>
-      <p>Quick Attack</p>
-    </GridListTile>
-  </GridList>
+  <div>
+    <h3>Available skills</h3>
+    <GridList cellHeight={70}>
+      <GridListTile>
+        <p>Quick Attack</p>
+      </GridListTile>
+      <GridListTile>
+        <p>Block</p>
+      </GridListTile>
+    </GridList>
+  </div>
 );
 
 const GameplayContainer: React.FC<Props> = ({
