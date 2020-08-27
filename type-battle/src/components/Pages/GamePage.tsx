@@ -28,6 +28,9 @@ function GamePage(): JSX.Element {
       messages = [...messages, text];
     });
   }, []);
+  useEffect(() => {
+    chatDisplayScrollToBottom();
+  }, [messages]);
 
   const chatDisplayScrollToBottom = () => {
     let chatBoxElement = document.getElementById("scrolltobottom");
@@ -47,11 +50,9 @@ function GamePage(): JSX.Element {
       const messageToSend = `${info}: ${playerInputSkill}`;
       socket.emit("message", messageToSend);
       socket.emit("update", messageToSend);
-      //console.log("567");
-      chatDisplayScrollToBottom();
+
       //reset input textbox value, need to add cooldown timer
       setPlayerInputSkill((playerInputSkill) => (playerInputSkill = ""));
-      //console.log("reset");
     }
   };
 

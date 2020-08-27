@@ -17,6 +17,7 @@ const useStyles = makeStyles(() =>
       borderRadius: "0.5rem",
       background: "none",
       display: "flex",
+      margin: "1.5rem 0",
     },
     input: {
       "&.MuiOutlinedInput-root": {
