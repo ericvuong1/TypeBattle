@@ -16,6 +16,11 @@ function GamePage(): JSX.Element {
   let [info, setInfo] = useState<"Player1" | "Player2" | "Player?">("Player?"); //TODO: how to show player 2? can we use info?
   let [state, setState] = useState<BoardState | undefined>(undefined); // Seems like the state shows player 1 and player 2
   let [playerInputSkill, setPlayerInputSkill] = useState<string>(""); // use useRef
+  let [playerInputDisabled, setPlayerInputDisabled] = useState<boolean>(false);
+  let currentPlayer: PlayerInfo | undefined | false =
+    state && info !== "Player?" && state[info];
+  let enemyPlayer: PlayerInfo | undefined | false =
+    state && ENEMY_PLAYER !== "Player?" && state[ENEMY_PLAYER];
 
   useEffect(() => {
     socket.on("info", (currentPlayer: "Player1" | "Player2") => {
@@ -28,9 +33,10 @@ function GamePage(): JSX.Element {
       messages = [...messages, text];
     });
   }, []);
+
   useEffect(() => {
     chatDisplayScrollToBottom();
-  }, [messages]);
+  });
 
   const chatDisplayScrollToBottom = () => {
     let chatBoxElement = document.getElementById("scrolltobottom");
@@ -45,6 +51,17 @@ function GamePage(): JSX.Element {
     setPlayerInputSkill((playerInputSkill) => (playerInputSkill = value));
   };
 
+  const winnerDecider = () => {
+    if (state?.Player1["hp"] === 0) {
+      setPlayerInputDisabled(true);
+      socket.emit("message", "Player2 Won");
+    }
+    if (state?.Player2["hp"] === 0) {
+      setPlayerInputDisabled(true);
+      socket.emit("message", "Player1 Won");
+    }
+  };
+
   const onEnterKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && playerInputSkill !== "") {
       const messageToSend = `${info}: ${playerInputSkill}`;
@@ -53,13 +70,11 @@ function GamePage(): JSX.Element {
 
       //reset input textbox value, need to add cooldown timer
       setPlayerInputSkill((playerInputSkill) => (playerInputSkill = ""));
+      //Bug, can send one more message before input is disabled
+      winnerDecider();
     }
   };
 
-  let currentPlayer: PlayerInfo | undefined | false =
-    state && info !== "Player?" && state[info];
-  let enemyPlayer: PlayerInfo | undefined | false =
-    state && ENEMY_PLAYER !== "Player?" && state[ENEMY_PLAYER];
   return (
     <div>
       <h1>Typebattle</h1>
@@ -78,6 +93,7 @@ function GamePage(): JSX.Element {
           inputChange={onPlayerCommandSubmit}
           onEnterKeyPress={onEnterKeyPress}
           messages={messages}
+          gameEnd={playerInputDisabled}
         />
         <Player playerState={currentPlayer} />
       </div>

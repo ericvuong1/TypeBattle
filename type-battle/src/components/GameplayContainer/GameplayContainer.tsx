@@ -10,6 +10,7 @@ interface Props {
   inputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onEnterKeyPress: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   messages: string[];
+  gameEnd: boolean;
 }
 
 const useStyles = makeStyles(() =>
@@ -51,6 +52,7 @@ const GameplayContainer: React.FC<Props> = ({
   inputChange,
   onEnterKeyPress,
   messages,
+  gameEnd,
 }) => {
   const classes = useStyles();
   return (
@@ -64,6 +66,7 @@ const GameplayContainer: React.FC<Props> = ({
         value={value}
         playerInputChange={inputChange}
         onEnterKeyPress={onEnterKeyPress}
+        gameEnd={gameEnd}
       />
       {availableSkills}
     </div>

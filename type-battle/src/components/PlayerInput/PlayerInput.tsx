@@ -7,6 +7,7 @@ interface Props {
   value: string;
   playerInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onEnterKeyPress: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+  gameEnd: boolean;
 }
 
 const useStyles = makeStyles(() =>
@@ -43,6 +44,7 @@ const PlayerInput: React.FC<Props> = ({
   value,
   playerInputChange,
   onEnterKeyPress,
+  gameEnd,
 }) => {
   const classes = useStyles();
   return (
@@ -59,6 +61,7 @@ const PlayerInput: React.FC<Props> = ({
         }}
         onCopy={disableCopyPaste}
         onPaste={disableCopyPaste}
+        disabled={gameEnd}
       ></TextField>
       <Button className={classes.button} variant="contained">
         Enter
