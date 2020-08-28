@@ -36,6 +36,7 @@ function GamePage(): JSX.Element {
 
   useEffect(() => {
     chatDisplayScrollToBottom();
+    winnerDecider();
   });
 
   const chatDisplayScrollToBottom = () => {
@@ -52,14 +53,8 @@ function GamePage(): JSX.Element {
   };
 
   const winnerDecider = () => {
-    if (state?.Player1["hp"] === 0) {
+    if (state?.Player1["hp"] || state?.Player2["hp"] === 0)
       setPlayerInputDisabled(true);
-      socket.emit("message", "Player2 Won");
-    }
-    if (state?.Player2["hp"] === 0) {
-      setPlayerInputDisabled(true);
-      socket.emit("message", "Player1 Won");
-    }
   };
 
   const onEnterKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -71,7 +66,7 @@ function GamePage(): JSX.Element {
       //reset input textbox value, need to add cooldown timer
       setPlayerInputSkill((playerInputSkill) => (playerInputSkill = ""));
       //Bug, can send one more message before input is disabled
-      winnerDecider();
+      //winnerDecider();
     }
   };
 
