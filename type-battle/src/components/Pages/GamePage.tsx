@@ -78,6 +78,7 @@ function GamePage(): JSX.Element {
           inputChange={onPlayerCommandSubmit}
           onEnterKeyPress={onEnterKeyPress}
           messages={messages}
+          isDisabled={currentPlayer && currentPlayer.disabled}
         />
         <Player playerState={currentPlayer} />
       </div>

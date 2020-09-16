@@ -10,6 +10,7 @@ interface Props {
   inputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onEnterKeyPress: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   messages: string[];
+  isDisabled: boolean | undefined ;
 }
 
 const useStyles = makeStyles(() =>
@@ -51,6 +52,7 @@ const GameplayContainer: React.FC<Props> = ({
   inputChange,
   onEnterKeyPress,
   messages,
+  isDisabled
 }) => {
   const classes = useStyles();
   return (
@@ -64,6 +66,7 @@ const GameplayContainer: React.FC<Props> = ({
         value={value}
         playerInputChange={inputChange}
         onEnterKeyPress={onEnterKeyPress}
+        isDisabled={isDisabled}
       />
       {availableSkills}
     </div>

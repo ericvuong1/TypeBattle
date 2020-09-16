@@ -7,6 +7,7 @@ interface Props {
   value: string;
   playerInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onEnterKeyPress: (event: React.KeyboardEvent<HTMLInputElement>) => void;
+  isDisabled: boolean | undefined
 }
 
 const useStyles = makeStyles(() =>
@@ -43,6 +44,7 @@ const PlayerInput: React.FC<Props> = ({
   value,
   playerInputChange,
   onEnterKeyPress,
+  isDisabled
 }) => {
   const classes = useStyles();
   return (
@@ -60,7 +62,7 @@ const PlayerInput: React.FC<Props> = ({
         onCopy={disableCopyPaste}
         onPaste={disableCopyPaste}
       ></TextField>
-      <Button className={classes.button} variant="contained">
+      <Button className={classes.button} disabled={isDisabled} variant="contained">
         Enter
       </Button>
     </div>
