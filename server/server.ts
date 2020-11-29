@@ -44,6 +44,7 @@ io.on('connection', (sock) => {
     }
 
   sock.on('message', (text) => {
+    console.log(`Received message: ${text}`)
     io.emit('message', text);
   });
 

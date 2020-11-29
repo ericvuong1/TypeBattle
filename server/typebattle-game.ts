@@ -6,6 +6,7 @@ import socketio from 'socket.io';
 
 // const spells: Spell[] = require('spells.json')['spells'];
 import { spells } from './spells.json';
+import { count } from 'console';
 
 export type Spell = {
   name: string
@@ -68,9 +69,8 @@ export default class TypeBattleGame {
    * @param damage 
    */
 
-  _attemptAttackPlayer(attackedPlayer: PlayerString, spell: Spell) {
-    const damage = spell['damage'];
-    const selfDamage = spell['selfDamage']
+  _attemptAttackPlayer(attackedPlayer: PlayerString, spell: Spell): void {
+    const { damage, selfDamage } = spell
     const currentPlayer = this.otherPlayer(attackedPlayer);
 
     // If attacking a player that is blocking, trigger their counter attack 
@@ -79,9 +79,13 @@ export default class TypeBattleGame {
       // TODO: Do counter attack properly
       console.log("Counter Attacking!");
       const counterSpell = this.boardState[attackedPlayer]['counterAttackSpell']
-      if (counterSpell !== undefined) {
-        this._processSpell(attackedPlayer, counterSpell);
+      if (counterSpell === undefined) {
+        console.log("No counter spell found!")
+        return;
       }
+      console.log(`Counter spell is ${JSON.stringify(counterSpell)}`)
+      this._processSpell(attackedPlayer, counterSpell);
+
     }
     else {
       this.boardState[attackedPlayer]['hp'] -= damage;
@@ -105,21 +109,22 @@ export default class TypeBattleGame {
   }
 
   _processSpell(attacker: PlayerString, spell: Spell): void {
-    let attacked = this.otherPlayer(attacker);;
-    const damage = spell['damage'];
-    const selfDamage = spell["selfDamage"];
-    const delayTimeDamage = spell["delayTimeDamage"];
-    const cooldownTime = spell["cooldownTime"];
-    const stunTime = spell["stunTime"];
-    const invulnerabilityTime = spell["invulnerabilityTime"];
-    const overtimeDamage = spell["overtimeDamage"];
-    const overTimeDamageDuration = spell["overTimeDamageDuration"];
-    let counterAttackSpellString = spell["counterAttackSpell"];
-    let counterAttackSpell: Spell | undefined = undefined;
-    if (counterAttackSpellString !== undefined) {
-      counterAttackSpell = spells.find((s: Spell) => s['name'] === counterAttackSpellString);
+    let attacked = this.otherPlayer(attacker);
+    let { damage,
+      selfDamage,
+      delayTimeDamage,
+      cooldownTime,
+      stunTime,
+      invulnerabilityTime,
+      overtimeDamage,
+      overTimeDamageDuration,
+      counterAttackSpell
+    } = spell
+    let actualCounterAttackSpell: Spell | undefined = undefined;
+    if (counterAttackSpell !== undefined) {
+      actualCounterAttackSpell = spells.find((s: Spell) => s['name'] === counterAttackSpell);
     }
-    this.boardState[attacker]['counterAttackSpell'] = counterAttackSpell;
+    this.boardState[attacker]['counterAttackSpell'] = actualCounterAttackSpell;
 
     // TODO: manage cooldowns?
 
@@ -142,27 +147,6 @@ export default class TypeBattleGame {
       }, delayTimeDamage);
     }
     this._updateStateToPlayersAndCheckGameOver();
-
-    // TODO: move away from this switch case statement
-    // switch (spell['name']) {
-    //   case 'Quick Attack':
-    //     console.log('Attacking');
-    //     this._attemptAttackPlayer(otherPlayer, spell);
-    //     break;
-    //   case 'Block':
-    //     // set player flag to isBlocking
-    //     this.boardState[currentPlayer].isInvulnerable = true;
-    //     this._updateStateToPlayers();
-    //     this._disableInput(currentPlayer);
-    //     setTimeout(() => {
-    //       this._enableInput(currentPlayer);
-    //       this.boardState[currentPlayer].isInvulnerable = false;
-    //       this._updateStateToPlayers();
-    //     }, 2000);
-    //     break;
-    //   default:
-    //     break;
-    // }
   }
 
   update(text: string) {
