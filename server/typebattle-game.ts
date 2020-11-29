@@ -8,6 +8,9 @@ import socketio from 'socket.io';
 import { spells } from './spells.json';
 import { count } from 'console';
 
+// logger stuff
+import {attackLogger, gameLogger} from "./logging/config"
+
 export type Spell = {
   name: string
   damage: number
@@ -77,7 +80,7 @@ export default class TypeBattleGame {
     if (this.boardState[attackedPlayer].isInvulnerable) {
       // Calling counter attack
       // TODO: Do counter attack properly
-      console.log("Counter Attacking!");
+      attackLogger.info("Counter Attacking!");
       const counterSpell = this.boardState[attackedPlayer]['counterAttackSpell']
       if (counterSpell === undefined) {
         console.log("No counter spell found!")
@@ -85,7 +88,6 @@ export default class TypeBattleGame {
       }
       console.log(`Counter spell is ${JSON.stringify(counterSpell)}`)
       this._processSpell(attackedPlayer, counterSpell);
-
     }
     else {
       this.boardState[attackedPlayer]['hp'] -= damage;
@@ -109,6 +111,7 @@ export default class TypeBattleGame {
   }
 
   _processSpell(attacker: PlayerString, spell: Spell): void {
+    attackLogger.info(`Processing spell for attack=${attacker}, spell=${JSON.stringify(spell)}`)
     let attacked = this.otherPlayer(attacker);
     let { damage,
       selfDamage,
@@ -144,8 +147,21 @@ export default class TypeBattleGame {
       setTimeout(() => {
         this._enableInput(attacker);
         this._attemptAttackPlayer(attacked, spell);
+        this._updateStateToPlayersAndCheckGameOver();
       }, delayTimeDamage);
     }
+    // TODO: This doesn't work\
+    // START
+    if (stunTime > 0) {
+      this._disableInput(attacker);
+      setTimeout(() => {
+        attackLogger.info(`Re-enabling player=${attacker}'s input`)
+        this._enableInput(attacker);
+        this._updateStateToPlayersAndCheckGameOver();
+      }, stunTime);
+    }
+    // END
+
     this._updateStateToPlayersAndCheckGameOver();
   }
 
@@ -209,10 +225,12 @@ export default class TypeBattleGame {
   }
 
   _disableInput(player: PlayerString) {
+    attackLogger.info(`Disabling ${player}'s input`)
     this.boardState[player]['disabled'] = true;
   }
 
   _enableInput(player: PlayerString) {
+    attackLogger.info(`Enabling ${player}'s input`)
     this.boardState[player]['disabled'] = false;
   }
 
