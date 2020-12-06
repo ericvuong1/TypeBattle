@@ -5,6 +5,7 @@ export default class Player {
     disabled: boolean
     isInvulnerable: boolean
     counterAttackSpell: Spell | undefined 
+    enableTime: number | undefined
 
     constructor(hp: number, name: string) {
         this.hp = hp;
@@ -12,6 +13,7 @@ export default class Player {
         this.disabled = false;
         this.isInvulnerable = false;
         this.counterAttackSpell = undefined;
+        this.enableTime = undefined
     }
 }
 
