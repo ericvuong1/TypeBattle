@@ -6,6 +6,11 @@ import socketio from 'socket.io';
 
 // const spells: Spell[] = require('spells.json')['spells'];
 import { spells } from './spells.json';
+import { count } from 'console';
+
+// logger stuff
+import {attackLogger, gameLogger} from "./logging/config"
+import { LoggerControlImpl } from 'typescript-logging/dist/commonjs/control/LogGroupControl';
 
 export type Spell = {
   name: string
@@ -68,20 +73,22 @@ export default class TypeBattleGame {
    * @param damage 
    */
 
-  _attemptAttackPlayer(attackedPlayer: PlayerString, spell: Spell) {
-    const damage = spell['damage'];
-    const selfDamage = spell['selfDamage']
+  _attemptAttackPlayer(attackedPlayer: PlayerString, spell: Spell): void {
+    const { damage, selfDamage } = spell
     const currentPlayer = this.otherPlayer(attackedPlayer);
 
     // If attacking a player that is blocking, trigger their counter attack 
     if (this.boardState[attackedPlayer].isInvulnerable) {
       // Calling counter attack
       // TODO: Do counter attack properly
-      console.log("Counter Attacking!");
+      attackLogger.info("Counter Attacking!");
       const counterSpell = this.boardState[attackedPlayer]['counterAttackSpell']
-      if (counterSpell !== undefined) {
-        this._processSpell(attackedPlayer, counterSpell);
+      if (counterSpell === undefined) {
+        console.log("No counter spell found!")
+        return;
       }
+      console.log(`Counter spell is ${JSON.stringify(counterSpell)}`)
+      this._processSpell(attackedPlayer, counterSpell);
     }
     else {
       this.boardState[attackedPlayer]['hp'] -= damage;
@@ -99,35 +106,37 @@ export default class TypeBattleGame {
    * @param player 
    * @param invincible 
    */
-  _setInvulnerable(player: PlayerString, invincible: boolean) {
+  _setInvulnerable(player: PlayerString, invincible: boolean, invulnerabilityTime: number) {
     this.boardState[player]['isInvulnerable'] = invincible;
-    invincible ? this._disableInput(player) : this._enableInput(player);
+    invincible ? this._disableInput(player, invulnerabilityTime) : this._enableInput(player);
   }
 
   _processSpell(attacker: PlayerString, spell: Spell): void {
-    let attacked = this.otherPlayer(attacker);;
-    const damage = spell['damage'];
-    const selfDamage = spell["selfDamage"];
-    const delayTimeDamage = spell["delayTimeDamage"];
-    const cooldownTime = spell["cooldownTime"];
-    const stunTime = spell["stunTime"];
-    const invulnerabilityTime = spell["invulnerabilityTime"];
-    const overtimeDamage = spell["overtimeDamage"];
-    const overTimeDamageDuration = spell["overTimeDamageDuration"];
-    let counterAttackSpellString = spell["counterAttackSpell"];
-    let counterAttackSpell: Spell | undefined = undefined;
-    if (counterAttackSpellString !== undefined) {
-      counterAttackSpell = spells.find((s: Spell) => s['name'] === counterAttackSpellString);
+    attackLogger.info(`Processing spell for attack=${attacker}, spell=${JSON.stringify(spell)}`)
+    let attacked = this.otherPlayer(attacker);
+    let { damage,
+      selfDamage,
+      delayTimeDamage,
+      cooldownTime,
+      stunTime,
+      invulnerabilityTime,
+      overtimeDamage,
+      overTimeDamageDuration,
+      counterAttackSpell
+    } = spell
+    let actualCounterAttackSpell: Spell | undefined = undefined;
+    if (counterAttackSpell !== undefined) {
+      actualCounterAttackSpell = spells.find((s: Spell) => s['name'] === counterAttackSpell);
     }
-    this.boardState[attacker]['counterAttackSpell'] = counterAttackSpell;
+    this.boardState[attacker]['counterAttackSpell'] = actualCounterAttackSpell;
 
     // TODO: manage cooldowns?
 
     // Disable players in invulnerability mode
     if (invulnerabilityTime > 0) {
-      this._setInvulnerable(attacker, true)
+      this._setInvulnerable(attacker, true, invulnerabilityTime)
       setTimeout(() => {
-        this._setInvulnerable(attacker, false);
+        this._setInvulnerable(attacker, false, invulnerabilityTime);
         this._updateStateToPlayersAndCheckGameOver();
         this._checkGameOver();
       }, invulnerabilityTime);
@@ -135,34 +144,27 @@ export default class TypeBattleGame {
 
     // Damage will be delayed
     if (delayTimeDamage > 0) {
-      this._disableInput(attacker);
+      this._disableInput(attacker, delayTimeDamage);
       setTimeout(() => {
+        attackLogger.info(`${attacker} trying to attack ${attacked}`)
         this._enableInput(attacker);
         this._attemptAttackPlayer(attacked, spell);
+        this._updateStateToPlayersAndCheckGameOver();
       }, delayTimeDamage);
     }
-    this._updateStateToPlayersAndCheckGameOver();
+    // TODO: This doesn't work\
+    // START
+    if (stunTime > 0) {
+      attackLogger.info(`${attacker} trying to stun ${attacked}`)
+      this._disableInput(attacked, stunTime);
+      setTimeout(() => {
+        this._enableInput(attacked);
+        this._updateStateToPlayersAndCheckGameOver();
+      }, stunTime);
+    }
+    // END
 
-    // TODO: move away from this switch case statement
-    // switch (spell['name']) {
-    //   case 'Quick Attack':
-    //     console.log('Attacking');
-    //     this._attemptAttackPlayer(otherPlayer, spell);
-    //     break;
-    //   case 'Block':
-    //     // set player flag to isBlocking
-    //     this.boardState[currentPlayer].isInvulnerable = true;
-    //     this._updateStateToPlayers();
-    //     this._disableInput(currentPlayer);
-    //     setTimeout(() => {
-    //       this._enableInput(currentPlayer);
-    //       this.boardState[currentPlayer].isInvulnerable = false;
-    //       this._updateStateToPlayers();
-    //     }, 2000);
-    //     break;
-    //   default:
-    //     break;
-    // }
+    this._updateStateToPlayersAndCheckGameOver();
   }
 
   update(text: string) {
@@ -207,8 +209,8 @@ export default class TypeBattleGame {
 
   _checkGameOver() {
     let endGame = (winner: socketio.Socket, loser: socketio.Socket) => {
-      this._disableInput('Player1');
-      this._disableInput('Player2');
+      this._disableInput('Player1', 10000); // TODO: put a good time kek
+      this._disableInput('Player2', 10000);
       this._updateStateToPlayers();
       this._sendWinMessage(winner, loser);
     }
@@ -224,12 +226,29 @@ export default class TypeBattleGame {
     }
   }
 
-  _disableInput(player: PlayerString) {
+  _disableInput(player: PlayerString, disableTime: number) {
+    const enableTime: number = Date.now() + disableTime
+    attackLogger.info(`Disabling ${player}'s input, enableTime=${enableTime}`)
     this.boardState[player]['disabled'] = true;
+    const currentEnableTime: number | undefined = this.boardState[player]['enableTime']
+    if (currentEnableTime && currentEnableTime < enableTime) {
+      this.boardState[player]['enableTime'] = enableTime
+    } else if (currentEnableTime === undefined) {
+      this.boardState[player]['enableTime'] = enableTime;
+    }
   }
 
-  _enableInput(player: PlayerString) {
+  _enableInput(player: PlayerString): void {
+    attackLogger.info(`Attempt enabling ${player}'s input`)
+    const now: number = Date.now()
+    const enableTime: number | undefined = this.boardState[player]['enableTime']
+    attackLogger.info(`enableTime=${enableTime}, now=${now}`)
+    if (enableTime && enableTime > now) {
+      attackLogger.info(`Cannot enable ${player}'s input, not the right time...`)
+      return;
+    }
     this.boardState[player]['disabled'] = false;
+    this.boardState[player]['enableTime'] = undefined;
   }
 
   _sendWinMessage(winner: socketio.Socket, loser: socketio.Socket) {

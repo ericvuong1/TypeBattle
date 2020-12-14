@@ -18,7 +18,8 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.2",
-    "socket.io": "^2.0.3"
+    "socket.io": "^2.0.3",
+    "typescript-logging": "^1.0.0"
   },
   "devDependencies": {
     "nodemon": "^1.12.1",
