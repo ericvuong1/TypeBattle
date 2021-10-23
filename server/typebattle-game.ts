@@ -20,7 +20,7 @@ export type Spell = {
   cooldownTime: number
   stunTime: number
   invulnerabilityTime: number
-  overtimeDamage: number
+  overtimeDamagePerSecond: number
   overTimeDamageDuration: number,
   counterAttackSpell: string | null
 }
@@ -120,7 +120,7 @@ export default class TypeBattleGame {
       cooldownTime,
       stunTime,
       invulnerabilityTime,
-      overtimeDamage,
+      overtimeDamagePerSecond,
       overTimeDamageDuration,
       counterAttackSpell
     } = spell

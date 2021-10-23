@@ -8,7 +8,19 @@
             "cooldownTime": 1000,
             "stunTime": 0,
             "invulnerabilityTime": 0,
-            "overtimeDamage": 0,
+            "overtimeDamagePerSecond": 0,
+            "overTimeDamageDuration": 0,
+            "counterAttackSpell": null 
+        },
+        {
+            "name": "Poison",
+            "damage": 0,
+            "selfDamage": 0,
+            "delayTimeDamage": 1000,
+            "cooldownTime": 1000,
+            "stunTime": 0,
+            "invulnerabilityTime": 0,
+            "overtimeDamagePerSecond": 50,
             "overTimeDamageDuration": 0,
             "counterAttackSpell": null 
         },
@@ -20,7 +32,7 @@
             "cooldownTime": 10000,
             "stunTime": 0,
             "invulnerabilityTime": 0,
-            "overtimeDamage": 0,
+            "overtimeDamagePerSecond": 0,
             "overTimeDamageDuration": 0,
             "counterAttackSpell": null 
         },
@@ -32,7 +44,7 @@
             "cooldownTime": 10000,
             "stunTime": 0, 
             "invulnerabilityTime": 3000,
-            "overtimeDamage": 0,
+            "overtimeDamagePerSecond": 0,
             "overTimeDamageDuration": 0,
             "counterAttackSpell": "Stun"
         },
@@ -44,7 +56,7 @@
             "cooldownTime": 10000,
             "stunTime": 0, 
             "invulnerabilityTime": 0,
-            "overtimeDamage": 0,
+            "overtimeDamagePerSecond": 0,
             "overTimeDamageDuration": 0,
             "counterAttackSpell": null
         },
@@ -56,7 +68,7 @@
             "cooldownTime": 15000,
             "stunTime": 0, 
             "invulnerabilityTime": 0,
-            "overtimeDamage": 40,
+            "overtimeDamagePerSecond": 40,
             "overTimeDamageDuration": 10000,
             "counterAttackSpell": null
         },
@@ -66,9 +78,9 @@
             "selfDamage": 0,
             "delayTimeDamage": 1,
             "cooldownTime": 0,
-            "stunTime": 3000,
+            "stunTime": 5000,
             "invulnerabilityTime": 0,
-            "overtimeDamage": 0,
+            "overtimeDamagePerSecond": 0,
             "overTimeDamageDuration": 0,
             "counterAttackSpell": null
         }

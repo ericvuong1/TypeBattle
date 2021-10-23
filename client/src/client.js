@@ -59,6 +59,7 @@ const updateGameState = (state) => {
     input.disabled = true;
   } else {
     input.disabled = false;
+    input.focus()
   }
 }
 
