@@ -10,6 +10,7 @@ import { count } from 'console';
 
 // logger stuff
 import {attackLogger, gameLogger} from "./logging/config"
+import { LoggerControlImpl } from 'typescript-logging/dist/commonjs/control/LogGroupControl';
 
 export type Spell = {
   name: string
@@ -105,9 +106,9 @@ export default class TypeBattleGame {
    * @param player
    * @param invincible
    */
-  _setInvulnerable(player: PlayerString, invincible: boolean) {
+  _setInvulnerable(player: PlayerString, invincible: boolean, invulnerabilityTime: number) {
     this.boardState[player]['isInvulnerable'] = invincible;
-    invincible ? this._disableInput(player) : this._enableInput(player);
+    invincible ? this._disableInput(player, invulnerabilityTime) : this._enableInput(player);
   }
 
   _processSpell(attacker: PlayerString, spell: Spell): void {
@@ -133,9 +134,9 @@ export default class TypeBattleGame {
 
     // Disable players in invulnerability mode
     if (invulnerabilityTime > 0) {
-      this._setInvulnerable(attacker, true)
+      this._setInvulnerable(attacker, true, invulnerabilityTime)
       setTimeout(() => {
-        this._setInvulnerable(attacker, false);
+        this._setInvulnerable(attacker, false, invulnerabilityTime);
         this._updateStateToPlayersAndCheckGameOver();
         this._checkGameOver();
       }, invulnerabilityTime);
@@ -143,8 +144,9 @@ export default class TypeBattleGame {
 
     // Damage will be delayed
     if (delayTimeDamage > 0) {
-      this._disableInput(attacker);
+      this._disableInput(attacker, delayTimeDamage);
       setTimeout(() => {
+        attackLogger.info(`${attacker} trying to attack ${attacked}`)
         this._enableInput(attacker);
         this._attemptAttackPlayer(attacked, spell);
         this._updateStateToPlayersAndCheckGameOver();
@@ -153,10 +155,10 @@ export default class TypeBattleGame {
     // TODO: This doesn't work\
     // START
     if (stunTime > 0) {
-      this._disableInput(attacker);
+      attackLogger.info(`${attacker} trying to stun ${attacked}`)
+      this._disableInput(attacked, stunTime);
       setTimeout(() => {
-        attackLogger.info(`Re-enabling player=${attacker}'s input`)
-        this._enableInput(attacker);
+        this._enableInput(attacked);
         this._updateStateToPlayersAndCheckGameOver();
       }, stunTime);
     }
@@ -207,8 +209,8 @@ export default class TypeBattleGame {
 
   _checkGameOver() {
     let endGame = (winner: socketio.Socket, loser: socketio.Socket) => {
-      this._disableInput('Player1');
-      this._disableInput('Player2');
+      this._disableInput('Player1', 10000); // TODO: put a good time kek
+      this._disableInput('Player2', 10000);
       this._updateStateToPlayers();
       this._sendWinMessage(winner, loser);
     }
@@ -224,14 +226,29 @@ export default class TypeBattleGame {
     }
   }
 
-  _disableInput(player: PlayerString) {
-    attackLogger.info(`Disabling ${player}'s input`)
+  _disableInput(player: PlayerString, disableTime: number) {
+    const enableTime: number = Date.now() + disableTime
+    attackLogger.info(`Disabling ${player}'s input, enableTime=${enableTime}`)
     this.boardState[player]['disabled'] = true;
+    const currentEnableTime: number | undefined = this.boardState[player]['enableTime']
+    if (currentEnableTime && currentEnableTime < enableTime) {
+      this.boardState[player]['enableTime'] = enableTime
+    } else if (currentEnableTime === undefined) {
+      this.boardState[player]['enableTime'] = enableTime;
+    }
   }
 
-  _enableInput(player: PlayerString) {
-    attackLogger.info(`Enabling ${player}'s input`)
+  _enableInput(player: PlayerString): void {
+    attackLogger.info(`Attempt enabling ${player}'s input`)
+    const now: number = Date.now()
+    const enableTime: number | undefined = this.boardState[player]['enableTime']
+    attackLogger.info(`enableTime=${enableTime}, now=${now}`)
+    if (enableTime && enableTime > now) {
+      attackLogger.info(`Cannot enable ${player}'s input, not the right time...`)
+      return;
+    }
     this.boardState[player]['disabled'] = false;
+    this.boardState[player]['enableTime'] = undefined;
   }
 
   _sendWinMessage(winner: socketio.Socket, loser: socketio.Socket) {
