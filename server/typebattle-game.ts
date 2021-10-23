@@ -68,15 +68,15 @@ export default class TypeBattleGame {
   /**
    * Attempts to attack player, could trigger various conditions and inflict damage to attacker
    * depending on the current status of the attacked player.
-   * @param attackedPlayer 
-   * @param damage 
+   * @param attackedPlayer
+   * @param damage
    */
 
   _attemptAttackPlayer(attackedPlayer: PlayerString, spell: Spell): void {
     const { damage, selfDamage } = spell
     const currentPlayer = this.otherPlayer(attackedPlayer);
 
-    // If attacking a player that is blocking, trigger their counter attack 
+    // If attacking a player that is blocking, trigger their counter attack
     if (this.boardState[attackedPlayer].isInvulnerable) {
       // Calling counter attack
       // TODO: Do counter attack properly
@@ -102,8 +102,8 @@ export default class TypeBattleGame {
 
   /**
    * For now, invulnerability means disabling users input
-   * @param player 
-   * @param invincible 
+   * @param player
+   * @param invincible
    */
   _setInvulnerable(player: PlayerString, invincible: boolean) {
     this.boardState[player]['isInvulnerable'] = invincible;
